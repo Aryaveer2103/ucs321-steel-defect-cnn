@@ -321,6 +321,14 @@ Batch normalization stabilizes intermediate activations. Global average pooling
 keeps the classifier small compared with flattening every spatial feature.
 Dropout reduces reliance on individual dense features. The loss is sparse
 categorical cross-entropy because each image has one integer class label.
+Before each validation pass, training refreshes BatchNormalization inference
+moments from all unaugmented **training** images at the current learned weights.
+The three layers are calibrated in order, using sample-weighted population
+moments. This corrects the moving-statistic lag found in the first full run;
+validation images never contribute to calibration. Augmentation and dropout are
+inactive during this pass, and learned weights and optimizer state are unchanged.
+The selected checkpoint contains these moments, so inference needs no extra
+calibration. The extra training-only forward passes increase epoch time.
 There is no pretrained ResNet/EfficientNet primary model. The readable parameter
 summary is saved as `outputs/models/architecture.txt`.
 
@@ -357,6 +365,10 @@ ignored packaging boundaries, nearest-integer 80/10/10 class balance, configurab
 seeds, duplicate handling across source folders, corrupt/changed images, obsolete
 manifest rejection, manifest immutability, path boundaries, metric calculations
 and shared inference preprocessing.
+They also check training sample shuffling before batching, reshuffling across
+epochs, reproducible seed behavior, image/label pairing, deterministic validation
+order, training integrity checks that do not open held-out images, and BN
+calibration with inactive augmentation and unequal batch sizes.
 Synthetic fixtures are not used to claim defect-recognition performance.
 
 The previous smoke model and its scores verified execution under the superseded

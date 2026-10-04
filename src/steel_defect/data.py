@@ -198,8 +198,12 @@ def read_manifest(path):
     return rows
 
 
-def validate_manifest(rows, root):
-    """Recheck content and partition integrity before fitting/evaluation."""
+def validate_manifest(rows, root, content_splits=("train", "val", "test")):
+    """Check global metadata; open pixels only for explicitly selected splits.
+
+    Training selects train/val to keep held-out images untouched. The default
+    full content check remains available for preparation and final evaluation.
+    """
     paths, hashes = set(), set()
     for row in rows:
         if row.get("split_method") != SPLIT_METHOD:
@@ -208,13 +212,17 @@ def validate_manifest(rows, root):
             raise ValueError("Manifest class/label mapping is inconsistent.")
         if row["split"] not in ("train", "val", "test"):
             raise ValueError(f"Invalid split: {row['split']}")
-        path = resolve_image(root, row["path"])
+        path = (Path(root).resolve() / row["path"]).resolve()
+        if not path.is_relative_to(Path(root).resolve()):
+            raise ValueError(f"Manifest path points outside dataset root: {row['path']}")
         if str(path) in paths or row["sha256"] in hashes:
             raise ValueError("Duplicate path or pixels in manifest; possible split leakage.")
         paths.add(str(path))
         hashes.add(row["sha256"])
-        if image_info(path) != (row["width"], row["height"], row["sha256"]):
-            raise ValueError(f"Image content changed since preparation: {row['path']}")
+        if row["split"] in content_splits:
+            path = resolve_image(root, row["path"])
+            if image_info(path) != (row["width"], row["height"], row["sha256"]):
+                raise ValueError(f"Image content changed since preparation: {row['path']}")
     counts = split_counts(rows)
     if any(value == 0 for group in counts.values() for value in group.values()):
         raise ValueError("Every split must contain every class.")

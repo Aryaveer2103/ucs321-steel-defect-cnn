@@ -26,13 +26,13 @@ def main():
     if (args.run_dir / "metrics" / "run_config.json").exists() or (args.run_dir / "models" / "best.keras").exists():
         raise FileExistsError(f"Training run exists: {args.run_dir}. Choose a new --run-dir; runs are not overwritten.")
     rows = read_manifest(args.manifest)
-    validate_manifest(rows, args.data_dir)
-    # Checking integrity is not fitting: test pixels are never supplied to model.fit.
+    validate_manifest(rows, args.data_dir, content_splits=("train", "val"))
     training_rows = [r for r in rows if r["split"] == "train"]
     validation_rows = [r for r in rows if r["split"] == "val"]
 
     import tensorflow as tf
     from .model import build_model
+    from .normalization import TrainingBatchNormCalibration
     from .visualize import plot_eda, plot_history
 
     tf.keras.utils.set_random_seed(config.seed)
@@ -55,6 +55,13 @@ def main():
         "devices": [str(device) for device in tf.config.list_physical_devices()],
     })
     model = build_model(config)
+    run_config["batch_norm_momentum"] = model.get_layer("batch_norm_1").momentum
+    run_config["training_shuffle"] = {"buffer_size": len(training_rows), "seed": config.seed,
+                                      "reshuffle_each_iteration": True, "before_batching": True}
+    run_config["content_checked_splits"] = ["train", "val"]
+    run_config["batch_norm_calibration"] = {"source_split": "train", "augmentation": False,
+                                           "timing": "before_each_validation", "moments": "population"}
+    save_json(metrics_dir / "run_config.json", run_config)
     model.summary()
     summary_lines = []
     model.summary(print_fn=lambda line: summary_lines.append(line))
@@ -63,15 +70,18 @@ def main():
                                             "input_range": [0, 255], "channels": 1})
     plot_eda(rows, args.data_dir, args.run_dir / "figures", config.seed)
     callbacks = [
+        TrainingBatchNormCalibration(make_dataset(training_rows, args.data_dir, config)),
         tf.keras.callbacks.ModelCheckpoint(model_dir / "best.keras", monitor="val_loss", save_best_only=True),
         tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=config.patience, restore_best_weights=True),
         tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-6),
         tf.keras.callbacks.CSVLogger(metrics_dir / "history.csv"),
         tf.keras.callbacks.TerminateOnNaN(),
     ]
+    # tf.data owns sample ordering: shuffle training samples BEFORE batching.
+    # model.fit's shuffle argument is ignored for Dataset inputs.
     history = model.fit(make_dataset(training_rows, args.data_dir, config, training=True),
                         validation_data=make_dataset(validation_rows, args.data_dir, config),
-                        epochs=config.epochs, callbacks=callbacks, verbose=2, shuffle=False)
+                        epochs=config.epochs, callbacks=callbacks, verbose=2)
     numeric_history = {key: [float(value) for value in values] for key, values in history.history.items()}
     save_json(metrics_dir / "history.json", numeric_history)
     plot_history(numeric_history, args.run_dir / "figures")

@@ -121,6 +121,17 @@ class DataIntegrityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "changed"):
             validate_manifest(read_manifest(self.root / "manifest.csv"), self.dataset)
 
+    def test_training_integrity_does_not_open_held_out_images(self):
+        rows = self.prepare()
+        for row in rows:
+            if row["split"] == "test":
+                (self.dataset / row["path"]).unlink()
+        # Metadata is checked globally, but training must not even require test
+        # image files to be present. Full integrity checks still detect absence.
+        validate_manifest(rows, self.dataset, content_splits=("train", "val"))
+        with self.assertRaises(FileNotFoundError):
+            validate_manifest(rows, self.dataset)
+
     def test_parent_path_escape_is_rejected(self):
         rows = self.prepare()
         rows[0]["path"] = "../outside.bmp"
