@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+.superpowers/
+data/*
+!data/README.md
+outputs/*
+!outputs/README.md
+*.keras
+*.h5
+.DS_Store
+Thumbs.db
