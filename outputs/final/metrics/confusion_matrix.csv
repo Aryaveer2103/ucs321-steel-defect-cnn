@@ -1,0 +1,7 @@
+true_class / predicted_class,crazing,inclusion,patches,pitted_surface,rolled-in_scale,scratches
+crazing,30,0,0,0,0,0
+inclusion,0,30,0,0,0,0
+patches,0,0,30,0,0,0
+pitted_surface,0,2,0,27,1,0
+rolled-in_scale,0,0,0,0,30,0
+scratches,0,1,0,0,0,29

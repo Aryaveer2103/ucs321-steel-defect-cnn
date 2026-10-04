@@ -1,0 +1,74 @@
+{
+  "data_dir": "data/raw/NEU-CLS",
+  "seed": 42,
+  "classes": [
+    "crazing",
+    "inclusion",
+    "patches",
+    "pitted_surface",
+    "rolled-in_scale",
+    "scratches"
+  ],
+  "split_method": "pooled_stratified_v2",
+  "requested_train_fraction": 0.8,
+  "requested_val_fraction": 0.1,
+  "requested_test_fraction": 0.1,
+  "packaging_boundaries_retained": false,
+  "source_packaging_counts": {
+    "train": {
+      "crazing": 295,
+      "inclusion": 295,
+      "patches": 295,
+      "pitted_surface": 295,
+      "rolled-in_scale": 295,
+      "scratches": 295
+    },
+    "val": {
+      "crazing": 5,
+      "inclusion": 5,
+      "patches": 5,
+      "pitted_surface": 5,
+      "rolled-in_scale": 5,
+      "scratches": 5
+    }
+  },
+  "split_rationale": "Pool unique images for classification; source train/valid packaging is not a required classification benchmark split.",
+  "counts": {
+    "train": {
+      "crazing": 240,
+      "inclusion": 240,
+      "patches": 239,
+      "pitted_surface": 240,
+      "rolled-in_scale": 240,
+      "scratches": 240
+    },
+    "val": {
+      "crazing": 30,
+      "inclusion": 30,
+      "patches": 30,
+      "pitted_surface": 30,
+      "rolled-in_scale": 30,
+      "scratches": 30
+    },
+    "test": {
+      "crazing": 30,
+      "inclusion": 30,
+      "patches": 30,
+      "pitted_surface": 30,
+      "rolled-in_scale": 30,
+      "scratches": 30
+    }
+  },
+  "image_sizes": {
+    "200x200": 1799
+  },
+  "raw_image_count": 1800,
+  "excluded_duplicates": [
+    {
+      "excluded_path": "train/train/images/patches_105.jpg",
+      "retained_path": "train/train/images/patches_101.jpg",
+      "sha256": "6dad9c2ccc47ab5fcbc841945e12381fd909a64de2a28f9831ae66199dccac61"
+    }
+  ],
+  "duplicate_policy": "Exclude exact same-class copies globally before splitting; retain first sorted path."
+}

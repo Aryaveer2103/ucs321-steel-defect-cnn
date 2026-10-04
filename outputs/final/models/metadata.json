@@ -1,0 +1,16 @@
+{
+  "classes": [
+    "crazing",
+    "inclusion",
+    "patches",
+    "pitted_surface",
+    "rolled-in_scale",
+    "scratches"
+  ],
+  "image_size": 128,
+  "input_range": [
+    0,
+    255
+  ],
+  "channels": 1
+}

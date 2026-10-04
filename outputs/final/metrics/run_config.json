@@ -1,0 +1,74 @@
+{
+  "seed": 42,
+  "image_size": 128,
+  "batch_size": 32,
+  "epochs": 50,
+  "learning_rate": 0.001,
+  "dropout": 0.3,
+  "patience": 8,
+  "filters": [
+    32,
+    64,
+    128
+  ],
+  "dense_units": 64,
+  "rotation": 0.025,
+  "translation": 0.05,
+  "zoom": 0.05,
+  "data_dir": "data/raw/NEU-CLS",
+  "classes": [
+    "crazing",
+    "inclusion",
+    "patches",
+    "pitted_surface",
+    "rolled-in_scale",
+    "scratches"
+  ],
+  "manifest_sha256": "a3e658e5cdebcb3b5b9d5ddf6399b626f612367c56dd1bbf5d2f9f1c42690a75",
+  "counts": {
+    "train": {
+      "crazing": 240,
+      "inclusion": 240,
+      "patches": 239,
+      "pitted_surface": 240,
+      "rolled-in_scale": 240,
+      "scratches": 240
+    },
+    "val": {
+      "crazing": 30,
+      "inclusion": 30,
+      "patches": 30,
+      "pitted_surface": 30,
+      "rolled-in_scale": 30,
+      "scratches": 30
+    },
+    "test": {
+      "crazing": 30,
+      "inclusion": 30,
+      "patches": 30,
+      "pitted_surface": 30,
+      "rolled-in_scale": 30,
+      "scratches": 30
+    }
+  },
+  "status": "trained",
+  "batch_norm_momentum": 0.99,
+  "training_shuffle": {
+    "buffer_size": 1439,
+    "seed": 42,
+    "reshuffle_each_iteration": true,
+    "before_batching": true
+  },
+  "content_checked_splits": [
+    "train",
+    "val"
+  ],
+  "batch_norm_calibration": {
+    "source_split": "train",
+    "augmentation": false,
+    "timing": "before_each_validation",
+    "moments": "population"
+  },
+  "epochs_completed": 50,
+  "best_epoch": 45
+}

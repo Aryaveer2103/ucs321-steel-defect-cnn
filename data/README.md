@@ -1,7 +1,8 @@
 # Dataset setup and provenance
 
-Images, archives and split manifests belong here and are excluded from Git.
-Do not upload the dataset to the project repository.
+Downloaded images, archives and locally generated manifests are excluded from Git.
+The authoritative frozen manifest and inspection summary are committed under
+`outputs/final/metrics/`. Do not upload the raw dataset to the project repository.
 
 ## Original source
 
@@ -14,14 +15,14 @@ Kechen Song and Yunhui Yan. The official page distinguishes NEU-CLS
 
 The official database description specifies 1,800 grayscale images, six classes,
 300 images per class and 200 × 200 pixels. It is a benchmark of cropped steel
-surface defects, not full-resolution Tata Steel production photographs.
+surface defects, not full-resolution production photographs.
 
 ## Reproducible automatic option
 
 After installing the project, run from the repository root:
 
 ```powershell
-python scripts/prepare_data.py --download --deduplicate
+python scripts/prepare_data.py --download --deduplicate --manifest outputs/final/metrics/manifest.csv
 ```
 
 This downloads the public **third-party mirror** uploaded by Weilin Cao:
@@ -55,7 +56,8 @@ There are 300 filenames per class, and all images decode at 200 × 200 pixels.
 `patches_101.jpg` and `patches_105.jpg` have identical decoded grayscale pixels.
 
 `--deduplicate` explicitly excludes the latter from the manifest without deleting
-either downloaded file. Every exclusion is recorded in `data/processed/manifest.json`.
+either downloaded file. The final exclusion is recorded in
+`outputs/final/metrics/dataset_summary.json`.
 Without this flag, preparation fails on the duplicate. Conflicting class labels
 always fail, even with deduplication. Deduplication takes place across the entire
 pool before final splitting, including copies in different packaging folders.
@@ -92,23 +94,20 @@ training. The final test set never influences augmentation, early stopping,
 checkpoint selection, learning-rate decisions or any tuning. Validation alone
 supports model selection. Do not replace this split after viewing test scores.
 
-`manifest.json` records the source packaging counts, ignored-boundary policy,
+`outputs/final/metrics/dataset_summary.json` records the source packaging counts, ignored-boundary policy,
 seed, requested ratios, resulting counts and deduplication exclusions. Each CSV
 row includes `split_method=pooled_stratified_v2`. Old manifests without this
-version are rejected, including previous smoke manifests. The superseded CSV/JSON
-are archived with `.invalid` in their filenames; they are development history.
-Regeneration was performed with:
+version are rejected. The final manifest SHA-256 is
+`a3e658e5cdebcb3b5b9d5ddf6399b626f612367c56dd1bbf5d2f9f1c42690a75`.
 
-```powershell
-python scripts/prepare_data.py --download --deduplicate --regenerate
-```
-
-Normal later invocations reuse the final frozen manifest. `--regenerate` is
-explicit and refuses to overwrite an existing invalidated archive. Choose a new
-manifest path for a deliberately separate protocol; never redraw the final split
-based on model scores.
+The preparation command above reuses and validates the committed manifest.
+Do not regenerate or edit this frozen final split. Separate datasets or protocols
+must use their own manifest and output paths.
 
 ## Manual official option
+
+This is an alternative dataset route for a separate experiment. It does not
+reproduce the final mirror's pixel hashes or replace the published final split.
 
 1. Open the official page and choose **NEU-CLS**, rather than NEU-CLS-64 or NEU-DET.
 2. Download the linked `NEU-CLS.rar` from Google Drive (or the official Baidu link).

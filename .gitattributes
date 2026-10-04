@@ -1,0 +1,4 @@
+# Preserve final artifact bytes, especially the SHA-256-pinned frozen CSV.
+outputs/final/** -text whitespace=cr-at-eol
+*.keras binary
+*.png binary

@@ -1,0 +1,12 @@
+{
+  "accuracy": 0.9777777777777777,
+  "macro_precision": 0.9794721407624634,
+  "macro_recall": 0.9777777777777779,
+  "macro_f1": 0.97773446304471,
+  "weighted_f1": 0.9777344630447099,
+  "test_samples": 180,
+  "test_cross_entropy": 0.060261160135269165,
+  "model_sha256": "24e83202be8281c790e606ff7d29856cc7985d7f07398e81cfe630af38549a5d",
+  "manifest_sha256": "a3e658e5cdebcb3b5b9d5ddf6399b626f612367c56dd1bbf5d2f9f1c42690a75",
+  "selected_epoch": 45
+}
